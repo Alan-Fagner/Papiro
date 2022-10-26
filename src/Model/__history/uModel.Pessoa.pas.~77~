@@ -1,0 +1,601 @@
+unit uModel.Pessoa;
+
+interface
+
+uses
+  uModel.Interfaces,
+  System.Generics.Collections,
+  System.Classes,
+  FireDAC.Comp.Client;
+
+type
+
+  TModelPessoa = class(TInterfacedObject, iModelPessoa)
+  private
+    Conn : iConexao;
+    Qry: TFDQuery;
+    Lista: TList<iModelPessoa>;
+    Thread : TThread;
+
+    FID: Integer;
+    FNOME : string;
+    FENDERECO : string;
+    FNUMERO : string;
+    FCOMPLEMENTO : string;
+    FBAIRRO : string;
+    FCIDADE : string;
+    FCEP : string;
+    FUF : string;
+    FRG : string;
+    FCPF : string;
+    FTEL1 : string;
+    FTEL2 : string;
+    FEMAIL : string;
+    FDT_NASC : TDate;
+    FTURMA : string;
+    FATIVO : Boolean;
+    FPERFIL : string;
+    FLOGIN : string;
+    FSENHA : string;
+    FDT_Cadastro : TDateTime;
+    FUs_Cadastro : Integer;
+    FDT_Alteracao : TDateTime;
+    FUs_Alteracao : Integer;
+    FObs : string;
+    FFOTO : string;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelPessoa;
+
+    Function List(xNome: string = ''; xPerfil: string = '') : TList<iModelPessoa>;
+    Function insert : Boolean;
+    Function Delete(ID: string) : Boolean;
+    Function Acesso(xUsuario, xSenha: string): iModelPessoa;
+    Function Total(xPerfil:string = ''):Integer;
+
+    Function ID(Value: Integer) : iModelPessoa; overload;
+    Function ID : Integer; overload;
+    Function NOME(Value: string) : iModelPessoa; overload;
+    Function NOME : string; overload;
+    Function ENDERECO(Value: string) : iModelPessoa; overload;
+    Function ENDERECO : string; overload;
+    Function NUMERO(Value: string) : iModelPessoa; overload;
+    Function NUMERO : string; overload;
+    Function COMPLEMENTO(Value: string) : iModelPessoa; overload;
+    Function COMPLEMENTO : string; overload;
+    Function BAIRRO(Value: string) : iModelPessoa; overload;
+    Function BAIRRO : string; overload;
+    Function CIDADE(Value: string) : iModelPessoa; overload;
+    Function CIDADE : string; overload;
+    Function CEP(Value: string) : iModelPessoa; overload;
+    Function CEP : string; overload;
+    Function UF(Value: string) : iModelPessoa; overload;
+    Function UF : string; overload;
+    Function RG(Value: string) : iModelPessoa; overload;
+    Function RG : string; overload;
+    Function CPF(Value: string) : iModelPessoa; overload;
+    Function CPF : string; overload;
+    Function TEL1(Value: string) : iModelPessoa; overload;
+    Function TEL1 : string; overload;
+    Function TEL2(Value: string) : iModelPessoa; overload;
+    Function TEL2 : string; overload;
+    Function EMAIL(Value: string) : iModelPessoa; overload;
+    Function EMAIL : string; overload;
+    Function DT_NASC(Value: TDate) : iModelPessoa; overload;
+    Function DT_NASC : TDate; overload;
+    Function TURMA(Value: string) : iModelPessoa; overload;
+    Function TURMA : string; overload;
+    Function ATIVO(Value: Boolean) : iModelPessoa; overload;
+    Function ATIVO : Boolean; overload;
+    Function PERFIL(Value: string) : iModelPessoa; overload;
+    Function PERFIL : string; overload;
+    Function LOGIN(Value: string) : iModelPessoa; overload;
+    Function LOGIN : string; overload;
+    Function SENHA(Value: string) : iModelPessoa; overload;
+    Function SENHA : string; overload;
+    Function DT_CADASTRO(Value: TDateTime) : iModelPessoa; overload;
+    Function DT_CADASTRO : TDateTime; overload;
+    Function US_CADASTRO(Value: Integer) : iModelPessoa; overload;
+    Function US_CADASTRO : Integer; overload;
+    Function DT_ALTERACAO(Value: TDateTime) : iModelPessoa; overload;
+    Function DT_ALTERACAO : TDateTime; overload;
+    Function US_ALTERACAO(Value: Integer) : iModelPessoa; overload;
+    Function US_ALTERACAO : Integer; overload;
+    Function OBS(Value: string) : iModelPessoa; overload;
+    Function OBS : string; overload;
+    Function FOTO(Value: string) : iModelPessoa; overload;
+    Function FOTO : string; overload;
+
+  end;
+
+implementation
+
+uses
+  uModel.Conexao, System.SysUtils;
+
+{ TModelPessoa }
+
+constructor TModelPessoa.Create;
+begin
+  Conn := TConexao.New;
+  Lista := TList<iModelPessoa>.Create;
+  Qry := TFDQuery.Create(nil);
+  Qry.Connection := Conn.Conexao;
+end;
+
+destructor TModelPessoa.Destroy;
+begin
+  FreeAndNil(lista);
+  FreeAndNil(Qry);
+  inherited;
+end;
+
+class function TModelPessoa.New: iModelPessoa;
+begin
+  Result:= Self.Create;
+end;
+
+function TModelPessoa.List(xNome, xPerfil: string): TList<iModelPessoa>;
+var
+  item: TModelPessoa;
+  SQL: TStringList;
+begin
+  SQL := TStringList.Create;
+  try
+    SQL.Add('Select * from TB_PESSOA');
+
+    if xNome <> '' then begin
+      if SQl.Count = 1 then SQL.Add(' Where ') else SQL.Add(' and ');
+      SQL.Add('(NOME like ''%'+xNome+'%'')')
+    end;
+
+    if xPerfil <> '' then begin
+      if SQl.Count = 1 then SQL.Add(' Where ') else SQL.Add(' and ');
+      SQL.Add('(PERFIL = '''+xPerfil+''')')
+    end;
+
+    SQL.Add(' order by Nome');
+
+    Qry.SQL.Clear;
+    Qry.SQL.Add(SQL.Text);
+    Qry.Open;
+    while not Qry.Eof do begin
+      item := TModelPessoa.Create;
+      item.ID             ( Qry.FieldByName('ID').AsInteger );
+      item.NOME           ( Qry.FieldByName('NOME').AsString );
+      item.ENDERECO       ( Qry.FieldByName('ENDERECO').AsString );
+      item.NUMERO         ( Qry.FieldByName('NUMERO').AsString );
+      item.COMPLEMENTO    ( Qry.FieldByName('COMPLEMENTO').AsString );
+      item.BAIRRO         ( Qry.FieldByName('BAIRRO').AsString );
+      item.CIDADE         ( Qry.FieldByName('CIDADE').AsString );
+      item.CEP            ( Qry.FieldByName('CEP').AsString );
+      item.UF             ( Qry.FieldByName('UF').AsString );
+      item.RG             ( Qry.fieldByName('RG').AsString );
+      item.CPF            ( Qry.FieldByName('CPF').AsString );
+      item.TEL1           ( Qry.FieldByName('TEL1').AsString );
+      item.TEL2           ( Qry.FieldByName('TEL2').AsString );
+      item.EMAIL          ( Qry.FieldByName('EMAIL').AsString );
+      item.DT_NASC        ( Qry.FieldByName('DT_NASCIMENTO').AsDateTime );
+      item.TURMA          ( Qry.FieldByName('TURMA').AsString );
+      item.ATIVO          ( Qry.FieldByName('ATIVO').AsBoolean );
+      item.PERFIL         ( Qry.FieldByName('PERFIL').AsString );
+      item.LOGIN          ( Qry.FieldByName('LOGIN').AsString );
+      item.SENHA          ( Qry.FieldByName('SENHA').AsString );
+      item.DT_CADASTRO    ( Qry.FieldByName('DT_CADASTRO').AsDateTime );
+      item.US_CADASTRO    ( Qry.FieldByName('USUARIO_CADASTRO').AsInteger );
+      item.DT_ALTERACAO   ( Qry.FieldByName('DT_ALTERACAO').AsDateTime );
+      item.US_ALTERACAO   ( Qry.FieldByName('USUARIO_ALTERACAO').AsInteger );
+      item.OBS            ( Qry.FieldByName('OBS').AsString );
+      item.FOTO           ( Qry.FieldByName('FOTO').AsString );
+
+      Lista.Add(item);
+      Qry.Next;
+    end;
+
+      Result := Lista;
+
+  finally
+    FreeAndNil(SQL);
+  end;
+end;
+
+
+function TModelPessoa.insert: Boolean;
+var
+  SQL: String;
+begin
+  Result := False;
+  try
+    TrueBoolStrs := ['True'];
+    FalseBoolStrs := ['False'];
+
+    if ID = 0 then begin //se ID = 0 inserir registro senão editar
+      SQL := 'INSERT INTO TB_PESSOA ( NOME, ENDERECO, NUMERO, COMPLEMENTO, BAIRRO, CIDADE, CEP, UF, RG, CPF, TEL1, TEL2, EMAIL, DT_NASCIMENTO, TURMA, ATIVO, PERFIL, LOGIN, SENHA, DT_CADASTRO, '+
+             'USUARIO_CADASTRO, DT_ALTERACAO, USUARIO_ALTERACAO, OBS, FOTO ) values ( '''+NOME+''', '''+ENDERECO+''', '''+NUMERO+''', '''+COMPLEMENTO+''',  '''+BAIRRO+''', '''+CIDADE+''', '+
+             ''''+CEP+''', '''+UF+''', '''+RG+''', '''+CPF+''', '''+TEL1+''', '''+TEL2+''', '''+EMAIL+''', '''+FormatDateTime('yyyy-mm-dd',DT_NASC)+''', '''+TURMA+''',   '''+BoolToStr(ATIVO,True)+''', '+
+             ''''+PERFIL+''', '''+LOGIN+''', '''+SENHA+''', '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_CADASTRO)+''', '''+IntToStr(US_CADASTRO)+''', '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_ALTERACAO)+''', '+
+             ''''+IntToStr(US_ALTERACAO)+''', '''+OBS+''', '''+FOTO+''')';
+    end else begin
+      SQL := 'UPDATE TB_PESSOA SET '+
+             'NOME = '''+NOME+''', '+
+             'ENDERECO = '''+ENDERECO+''', '+
+             'NUMERO = '''+NUMERO+''', '+
+             'COMPLEMENTO = '''+COMPLEMENTO+''', '+
+             'BAIRRO = '''+BAIRRO+''', '+
+             'CIDADE = '''+CIDADE+''', '+
+             'CEP = '''+CEP+''', '+
+             'UF = '''+UF+''', '+
+             'RG =  '''+RG+''', '+
+             'CPF =  '''+CPF+''', '+
+             'TEL1 = '''+TEL1+''', '+
+             'TEL2 = '''+TEL2+''', '+
+             'EMAIL = '''+EMAIL+''', '+
+             'DT_NASCIMENTO = '''+FormatDateTime('yyyy-mm-dd',DT_CADASTRO)+''', '+
+             'TURMA = '''+TURMA+''', '+
+             'ATIVO = '''+BoolToStr(ATIVO,True)+''', '+
+             'PERFIL = '''+PERFIL+''', '+
+             'LOGIN = '''+LOGIN+''', '+
+             'SENHA = '''+SENHA+''', '+
+             'DT_CADASTRO = '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_CADASTRO)+''', '+
+             'USUARIO_CADASTRO = '''+IntToStr(US_CADASTRO)+''', '+
+             'DT_ALTERACAO = '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_ALTERACAO)+''', '+
+             'USUARIO_ALTERACAO = '''+IntToStr(US_ALTERACAO)+''', '+
+             'OBS = '''+OBS+''', '+
+             'FOTO = '''+FOTO+''' '+
+             'WHERE ID = '''+IntToStr(ID)+'''';
+    end;
+
+     Conn.QryExecute(SQL);
+
+    Result := True;
+
+    except on E: Exception do
+      raise Exception.Create('Erro em inserir pessoa'+#13+E.Message);
+  end;
+end;
+
+function TModelPessoa.Delete(ID: string): Boolean;
+begin
+  Result := False;
+  try
+    Conn.QryExecute('DELETE FROM TB_PESSOA WHERE ID = '+ID);
+
+    Result := True;
+    except on E: Exception do begin
+      raise Exception.Create('Erro em excluir pessoa livro'+#13+E.Message);
+    end;
+  end;
+end;
+
+function TModelPessoa.Acesso(xUsuario, xSenha: string): iModelPessoa;
+begin
+  Result := Self;
+  with Conn.QryOpen('Select * from TB_PESSOA where (LOGIN = '''+xUsuario+''') and (SENHA = '''+xSenha+''')') do begin
+    Self.ID             ( FieldByName('ID').AsInteger );
+    Self.NOME           ( FieldByName('NOME').AsString );
+    Self.ENDERECO       ( FieldByName('ENDERECO').AsString );
+    Self.NUMERO         ( FieldByName('NUMERO').AsString );
+    Self.COMPLEMENTO    ( FieldByName('COMPLEMENTO').AsString );
+    Self.BAIRRO         ( FieldByName('BAIRRO').AsString );
+    Self.CIDADE         ( FieldByName('CIDADE').AsString );
+    Self.CEP            ( FieldByName('CEP').AsString );
+    Self.UF             ( FieldByName('UF').AsString );
+    Self.RG             ( FieldByName('RG').AsString );
+    Self.CPF            ( FieldByName('CPF').AsString );
+    Self.TEL1           ( FieldByName('TEL1').AsString );
+    Self.TEL2           ( FieldByName('TEL2').AsString );
+    Self.EMAIL          ( FieldByName('EMAIL').AsString );
+    Self.DT_NASC        ( FieldByName('DT_NASCIMENTO').AsDateTime );
+    Self.TURMA          ( FieldByName('TURMA').AsString );
+    Self.ATIVO          ( FieldByName('ATIVO').AsBoolean );
+    Self.PERFIL         ( FieldByName('PERFIL').AsString );
+    Self.LOGIN          ( FieldByName('LOGIN').AsString );
+    Self.SENHA          ( FieldByName('SENHA').AsString );
+    Self.DT_CADASTRO    ( FieldByName('DT_CADASTRO').AsDateTime );
+    Self.US_CADASTRO    ( FieldByName('USUARIO_CADASTRO').AsInteger );
+    Self.DT_ALTERACAO   ( FieldByName('DT_ALTERACAO').AsDateTime );
+    Self.US_ALTERACAO   ( FieldByName('USUARIO_ALTERACAO').AsInteger );
+    Self.OBS            ( FieldByName('OBS').AsString );
+    Self.FOTO           ( FieldByName('FOTO').AsString );
+  end;
+end;
+
+function TModelPessoa.Total(xPerfil: string): Integer;
+begin
+  if xPerfil = '' then
+    Result := Conn.QryOpen('select count(ID) from TB_PESSOA').Fields[0].AsInteger
+  else
+  Result := Conn.QryOpen('select count(ID) from TB_PESSOA where perfil = '''+xPerfil+'''').Fields[0].AsInteger;
+end;
+
+function TModelPessoa.LOGIN(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FLOGIN := Value;
+end;
+
+function TModelPessoa.LOGIN: string;
+begin
+  Result := FLOGIN;
+end;
+
+function TModelPessoa.ATIVO: Boolean;
+begin
+  Result := FATIVO;
+end;
+
+function TModelPessoa.ATIVO(Value: Boolean): iModelPessoa;
+begin
+  Result := Self;
+  FATIVO := Value;
+end;
+
+function TModelPessoa.BAIRRO: string;
+begin
+  Result := FBAIRRO
+end;
+
+function TModelPessoa.BAIRRO(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FBAIRRO := Value;
+end;
+
+function TModelPessoa.CEP(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FCEP := Value;
+end;
+
+function TModelPessoa.CEP: string;
+begin
+  Result := FCEP
+end;
+
+function TModelPessoa.CIDADE(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FCIDADE := Value;
+end;
+
+function TModelPessoa.CIDADE: string;
+begin
+  Result := FCIDADE;
+end;
+
+function TModelPessoa.COMPLEMENTO(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FCOMPLEMENTO := Value;
+end;
+
+function TModelPessoa.COMPLEMENTO: string;
+begin
+  Result := FCOMPLEMENTO;
+end;
+
+function TModelPessoa.CPF(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FCEP := Value;
+end;
+
+function TModelPessoa.CPF: string;
+begin
+  Result := FCPF;
+end;
+
+function TModelPessoa.DT_ALTERACAO(Value: TDateTime): iModelPessoa;
+begin
+  Result := Self;
+  FDT_Alteracao := Value;
+end;
+
+function TModelPessoa.DT_ALTERACAO: TDateTime;
+begin
+  Result := FDT_Alteracao;
+end;
+
+function TModelPessoa.DT_CADASTRO(Value: TDateTime): iModelPessoa;
+begin
+  Result := Self;
+  FDT_Cadastro := Value;
+
+end;
+
+function TModelPessoa.DT_CADASTRO: TDateTime;
+begin
+  Result := FDT_Cadastro;
+end;
+
+function TModelPessoa.DT_NASC: TDate;
+begin
+  Result := FDT_NASC;
+end;
+
+function TModelPessoa.DT_NASC(Value: TDate): iModelPessoa;
+begin
+  Result := Self;
+  FDT_NASC := Value;
+
+end;
+
+function TModelPessoa.EMAIL(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FEMAIL := Value;
+end;
+
+function TModelPessoa.EMAIL: string;
+begin
+  Result := FEMAIL;
+end;
+
+function TModelPessoa.ENDERECO(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FENDERECO := Value;
+end;
+
+function TModelPessoa.ENDERECO: string;
+begin
+  Result := FENDERECO;
+end;
+
+function TModelPessoa.FOTO: string;
+begin
+  Result := FFOTO;
+end;
+
+function TModelPessoa.FOTO(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FFOTO := Value;
+end;
+
+function TModelPessoa.ID(Value: Integer): iModelPessoa;
+begin
+  Result := Self;
+  FID := Value;
+end;
+
+function TModelPessoa.ID: Integer;
+begin
+  Result := FID;
+end;
+
+function TModelPessoa.NOME(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FNOME := Value;
+end;
+
+function TModelPessoa.NOME: string;
+begin
+  Result := FNOME;
+end;
+
+function TModelPessoa.NUMERO: string;
+begin
+  Result := FNUMERO;
+end;
+
+function TModelPessoa.NUMERO(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FNUMERO := Value;
+end;
+
+function TModelPessoa.OBS: string;
+begin
+  Result := FObs;
+end;
+
+function TModelPessoa.OBS(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FObs := Value;
+end;
+
+function TModelPessoa.PERFIL: string;
+begin
+  Result := FPERFIL;
+end;
+
+function TModelPessoa.PERFIL(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FPERFIL := Value;
+end;
+
+function TModelPessoa.RG(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FRG := Value;
+end;
+
+function TModelPessoa.RG: string;
+begin
+  Result := FRG;
+end;
+
+function TModelPessoa.SENHA(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FSENHA := Value;
+end;
+
+function TModelPessoa.SENHA: string;
+begin
+  Result := FSENHA;
+end;
+
+function TModelPessoa.TEL1: string;
+begin
+  Result := FTEL1;
+end;
+
+function TModelPessoa.TEL1(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FTEL1 := Value;
+end;
+
+function TModelPessoa.TEL2: string;
+begin
+  Result := FTEL2;
+end;
+
+function TModelPessoa.TEL2(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FTEL2 := Value;
+end;
+
+function TModelPessoa.TURMA(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FTURMA := Value;
+end;
+
+function TModelPessoa.TURMA: string;
+begin
+  Result := FTURMA
+end;
+
+function TModelPessoa.UF(Value: string): iModelPessoa;
+begin
+  Result := Self;
+  FUF := Value;
+end;
+
+function TModelPessoa.UF: string;
+begin
+  Result := FUF;
+end;
+
+function TModelPessoa.US_ALTERACAO: Integer;
+begin
+  Result := FUs_Alteracao
+end;
+
+function TModelPessoa.US_ALTERACAO(Value: Integer): iModelPessoa;
+begin
+  Result := Self;
+  FUs_Alteracao := Value;
+end;
+
+function TModelPessoa.US_CADASTRO: Integer;
+begin
+  Result := FUs_Cadastro;
+end;
+
+function TModelPessoa.US_CADASTRO(Value: Integer): iModelPessoa;
+begin
+  Result := Self;
+  FUs_Cadastro := Value;
+end;
+
+end.

@@ -1,0 +1,53 @@
+unit uConfiguracoes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
+  Vcl.WinXPanels, Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+
+type
+  TFrmConfiguracoes = class(TForm)
+    PnMenu: TPanel;
+    BtnSalvar: TPanel;
+    Image4: TImage;
+    Label5: TLabel;
+    CP: TCardPanel;
+    CardBibliotecario: TCard;
+    CPBibliotecario: TCardPanel;
+    CardTabela: TCard;
+    CardDados: TCard;
+    PnMenuBibliotecario: TPanel;
+    BtnRemover: TPanel;
+    Image1: TImage;
+    Label2: TLabel;
+    BtnAdicionar: TPanel;
+    Image2: TImage;
+    Label3: TLabel;
+    PnDados: TPanel;
+    PnPesquisar: TPanel;
+    Label1: TLabel;
+    Edit1: TEdit;
+    ListView1: TListView;
+    Panel1: TPanel;
+    BtnVoltar: TPanel;
+    Image3: TImage;
+    Label4: TLabel;
+    Panel2: TPanel;
+    Image5: TImage;
+    Label6: TLabel;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmConfiguracoes: TFrmConfiguracoes;
+
+implementation
+
+{$R *.dfm}
+
+end.

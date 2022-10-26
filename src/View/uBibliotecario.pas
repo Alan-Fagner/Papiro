@@ -1,0 +1,299 @@
+unit uBibliotecario;
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls,
+  Vcl.ComCtrls,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtDlgs,
+  uController.Interfaces;
+
+type
+  TFrmBibliotecario = class(TForm)
+    PnFundo: TPanel;
+    PC: TPageControl;
+    TSTabela: TTabSheet;
+    PnDados: TPanel;
+    PnMenu: TPanel;
+    BtnRemover: TPanel;
+    Image1: TImage;
+    Label2: TLabel;
+    BtnAdicionar: TPanel;
+    Image2: TImage;
+    Label3: TLabel;
+    TSDados: TTabSheet;
+    Panel1: TPanel;
+    BtnVoltar: TPanel;
+    Image3: TImage;
+    Label4: TLabel;
+    BtnSalvar: TPanel;
+    Image4: TImage;
+    Label5: TLabel;
+    LV: TListView;
+    Panel2: TPanel;
+    GridPanel1: TGridPanel;
+    Panel3: TPanel;
+    Label6: TLabel;
+    EdtNome: TEdit;
+    GroupBox1: TGroupBox;
+    Panel4: TPanel;
+    Label7: TLabel;
+    Panel5: TPanel;
+    Label8: TLabel;
+    EdtCEP: TEdit;
+    Panel7: TPanel;
+    Label10: TLabel;
+    EdtComplemento: TEdit;
+    Panel9: TPanel;
+    Label12: TLabel;
+    EdtBairro: TEdit;
+    Panel10: TPanel;
+    Label13: TLabel;
+    EdtCidade: TEdit;
+    Panel11: TPanel;
+    Label14: TLabel;
+    EdtEndereco: TEdit;
+    EdtNumero: TEdit;
+    Label15: TLabel;
+    CBUF: TComboBox;
+    GroupBox2: TGroupBox;
+    Panel12: TPanel;
+    Label16: TLabel;
+    EdtRG: TEdit;
+    Panel15: TPanel;
+    Label19: TLabel;
+    EdtCPF: TEdit;
+    GroupBox3: TGroupBox;
+    Panel6: TPanel;
+    Label9: TLabel;
+    EdtTel2: TEdit;
+    Panel16: TPanel;
+    Label20: TLabel;
+    EdtTel1: TEdit;
+    Panel8: TPanel;
+    Label11: TLabel;
+    EdtEmail: TEdit;
+    RGAtivo: TRadioGroup;
+    Label18: TLabel;
+    OP: TOpenPictureDialog;
+    Panel13: TPanel;
+    LblFoto: TLabel;
+    SBAdicionaFoto: TSpeedButton;
+    Img: TImage;
+    PnPesquisar: TPanel;
+    Label1: TLabel;
+    SBPesquisar: TSpeedButton;
+    EdtPesquisar: TEdit;
+    GroupBox6: TGroupBox;
+    Panel14: TPanel;
+    LblSenha: TLabel;
+    EdtSenha: TEdit;
+    Panel17: TPanel;
+    Label21: TLabel;
+    EdtLogin: TEdit;
+    GroupBox4: TGroupBox;
+    MmObs: TMemo;
+    MmInformacoes: TMemo;
+    procedure FormCreate(Sender: TObject);
+    procedure LVDblClick(Sender: TObject);
+    procedure BtnAdicionarClick(Sender: TObject);
+    procedure BtnRemoverClick(Sender: TObject);
+    procedure BtnSalvarClick(Sender: TObject);
+    procedure BtnVoltarClick(Sender: TObject);
+    procedure SBAdicionaFotoClick(Sender: TObject);
+    procedure SBPesquisarClick(Sender: TObject);
+  private
+    { Private declarations }
+    Controller: iController;
+  public
+    { Public declarations }
+    Procedure Lista(Nome: string = '');
+    procedure CarregarPessoa(Nome: string);
+  end;
+
+var
+  FrmBibliotecario: TFrmBibliotecario;
+
+implementation
+
+uses
+  uController, uUtil;
+
+{$R *.dfm}
+
+{ TForm1 }
+
+procedure TFrmBibliotecario.BtnAdicionarClick(Sender: TObject);
+begin
+  PC.ActivePage := TSDados;
+  GridPanel1.Width := Panel1.Width;
+end;
+
+procedure TFrmBibliotecario.BtnRemoverClick(Sender: TObject);
+begin
+  if LV.ItemIndex >= 0 then begin
+    case application.MessageBox(PWIDECHAR('Confirma a exclusão do Bibliotecário?'+#13+LV.ItemFocused.SubItems[0]), 'Confirmação', MB_yesno + MB_iconInformation) of
+      mrYes, mrOk: begin
+        if Controller.Pessoa.Delete(LV.ItemFocused.Caption) then
+          Lista;
+      end;
+
+      mrNo, mrCancel: exit;
+    end;
+  end;
+end;
+
+procedure TFrmBibliotecario.BtnSalvarClick(Sender: TObject);
+begin
+  with Controller.Pessoa do begin
+
+    if LV.ItemIndex >= 0 then begin
+      ID(List(LV.ItemFocused.SubItems[0]).Items[0].ID);
+      DT_CADASTRO(List(LV.ItemFocused.SubItems[0]).Items[0].DT_CADASTRO);
+      US_CADASTRO(List(LV.ItemFocused.SubItems[0]).Items[0].US_CADASTRO);
+      DT_ALTERACAO(now);
+      US_ALTERACAO(1);
+    end else begin
+      DT_CADASTRO(now);
+      US_CADASTRO(1);
+    end;
+
+    NOME(EdtNome.Text);
+    ENDERECO(EdtEndereco.Text);
+    NUMERO(EdtNumero.Text);
+    COMPLEMENTO(EdtComplemento.Text);
+    BAIRRO(EdtBairro.Text);
+    CIDADE(EdtCidade.Text);
+    CEP(EdtCEP.Text);
+    UF(CBUF.Text);
+    RG(EdtRG.Text);
+    CPF(EdtCPF.Text);
+    TEL1(EdtTel1.Text);
+    TEL2(EdtTel2.Text);
+    EMAIL(EdtEmail.Text);
+    OBS(MmObs.Lines.Text);
+    FOTO(LblFoto.Caption);
+    PERFIL('OPERADOR');
+    LOGIN(EdtLogin.Text);
+    SENHA(EdtSenha.Text);
+
+    case RGAtivo.ItemIndex of
+      0: ATIVO(True);
+      1: ATIVO(false);
+    end;
+
+    if insert then begin
+      LimpaCampo(Self);
+      LblFoto.Caption := 'C:\';
+      Img.Picture := nil;
+      PC.ActivePage := TSTabela;
+      Lista;
+    end else begin
+      ShowMessage('Erro ao Adicionar Bibliotecário');
+    end;
+  end;
+end;
+
+procedure TFrmBibliotecario.BtnVoltarClick(Sender: TObject);
+begin
+  LimpaCampo(Self);
+  LblFoto.Caption := 'C:\';
+  Img.Picture := nil;
+  PC.ActivePage := TSTabela;
+end;
+
+procedure TFrmBibliotecario.CarregarPessoa(Nome: string);
+begin
+  with Controller.Pessoa.List(Nome).Items[0] do begin
+    EdtNome.Text          := NOME;
+    EdtEndereco.Text      := ENDERECO;
+    EdtNumero.Text        := NUMERO;
+    EdtComplemento.Text   := COMPLEMENTO;
+    EdtBairro.Text        := BAIRRO;
+    EdtCidade.Text        := CIDADE;
+    EdtCEP.Text           := CEP;
+    CBUF.Items.IndexOf(UF);
+    EdtCPF.Text           := CPF;
+    EdtRG.Text            := RG;
+    EdtTel1.Text          := TEL1;
+    EdtTel2.Text          := TEL2;
+    EdtEmail.Text         := EMAIL;
+    MmOBS.Lines.Add(OBS);
+
+    if ATIVO then
+      RGAtivo.ItemIndex := 0
+    else
+      RGAtivo.ItemIndex := 1;
+
+    MmInformacoes.Lines.Add('Data do cadastrado: '+ DateTimeToStr(DT_CADASTRO));
+    MmInformacoes.Lines.Add('Usuário do Cadastrado: ');
+    MmInformacoes.Lines.Add('-------------------------------------------------');
+    MmInformacoes.Lines.Add('Data da última Alteração: '+ DateTimeToStr(DT_ALTERACAO));
+    MmInformacoes.Lines.Add('Usuário da última Alteração: ');
+
+  end;
+end;
+
+procedure TFrmBibliotecario.FormCreate(Sender: TObject);
+begin
+  Controller := TController.New;
+  PC.ActivePage := TSTabela;
+  Lista;
+end;
+
+procedure TFrmBibliotecario.Lista(Nome: string);
+var
+  i: integer;
+  item: TListItem;
+begin
+  LV.Clear;
+
+  with Controller.Pessoa.List(Nome,'OPERADOR') do begin
+    for i := 0 to pred(Count) do begin
+      Item := LV.Items.Add;
+      item.Caption := IntToStr(Items[i].ID);
+      Item.SubItems.Add( Items[i].NOME );
+        TrueBoolStrs := ['Sim'];
+        FalseBoolStrs := ['Não'];
+      Item.SubItems.Add( BoolToStr(Items[i].ATIVO,true));
+
+    end;
+  end;
+end;
+
+procedure TFrmBibliotecario.LVDblClick(Sender: TObject);
+begin
+  PC.ActivePage := TSDados;
+  GridPanel1.Width := Panel1.Width;
+
+  if LV.ItemIndex >= 0 then
+    CarregarPessoa(LV.ItemFocused.SubItems[0]);
+end;
+
+procedure TFrmBibliotecario.SBAdicionaFotoClick(Sender: TObject);
+begin
+  if OP.Execute then begin
+    LblFoto.Caption := OP.FileName;
+    Img.Picture.LoadFromFile(OP.FileName);
+  end;
+
+end;
+
+procedure TFrmBibliotecario.SBPesquisarClick(Sender: TObject);
+begin
+  Lista(EdtPesquisar.Text);
+end;
+
+end.

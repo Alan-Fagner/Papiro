@@ -1,0 +1,62 @@
+unit uConfiguracoes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls,
+  Vcl.WinXPanels, Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+
+type
+  TFrmConfiguracoes = class(TForm)
+    PnMenu: TPanel;
+    BtnBibliotecario: TPanel;
+    Image4: TImage;
+    LblBibliotecario: TLabel;
+    PnConteudo: TPanel;
+    procedure BtnBibliotecarioClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FormAtivo: TForm;
+    procedure Abrir_Form(xForm: TComponentClass);
+  end;
+
+var
+  FrmConfiguracoes: TFrmConfiguracoes;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmConfiguracoes.Abrir_Form(xForm: TComponentClass);
+begin
+  if Assigned(FormAtivo) then begin
+    if FormAtivo.ClassType = xForm then begin
+      exit
+    end else begin
+      FormAtivo.DisposeOf;
+      FormAtivo := nil;
+    end;
+  end;
+
+  Application.CreateForm(xForm, FormAtivo);
+
+  with FormAtivo do begin
+    Align := alClient;
+    BorderStyle := bsNone;
+    Parent := PnConteudo;
+    Visible := True;
+  end;
+
+  BtnBibliotecario.Color := clBtnFace;
+  LblBibliotecario.Font.Color := clHotLight;
+end;
+
+procedure TFrmConfiguracoes.BtnBibliotecarioClick(Sender: TObject);
+begin
+//
+end;
+
+end.

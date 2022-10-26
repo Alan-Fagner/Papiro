@@ -1,0 +1,134 @@
+unit uModel.Emprestimos;
+
+interface
+
+uses
+  uModel.Interfaces,
+  System.Generics.Collections;
+
+type
+
+  TModelEmprestimos = class(TInterfacedObject, iModelEmprestimos)
+  private
+    Conn : iConexao;
+    Lista: TList<iModelPessoa>;
+
+    FID: Integer;
+    FID_ALUNO : Integer;
+    FID_LIVRO : Integer;
+    FDT_EMPRESTIMO : TDate;
+    FDT_DEVOLUCAO : TDate;
+    FATIVO : Boolean;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelEmprestimos;
+
+    Function List(xAluno: string = ''; xLivro: string = '') : TList<iModelEmprestimos>;
+    Function insert : Boolean;
+    Function Delete(ID: string) : Boolean;
+    Function Total:Integer;
+
+    Function ID(Value: Integer) : iModelEmprestimos; overload;
+    Function ID : Integer; overload;
+    Function ALUNO(Value: Integer) : iModelEmprestimos; overload;
+    Function ALUNO : Integer; overload;
+    Function LIVRO(Value: Integer) : iModelEmprestimos; overload;
+    Function LIVRO : Integer; overload;
+    Function EMPRESTIMO(Value: TDateTime) : iModelEmprestimos; overload;
+    Function EMPRESTIMO : TDate; overload;
+    Function DEVOLUCAO(Value: TDateTime) : iModelEmprestimos; overload;
+    Function DEVOLUCAO : TDate; overload;
+    Function ATIVO(Value: Boolean) : iModelEmprestimos; overload;
+    Function ATIVO : Boolean; overload;
+
+  end;
+
+implementation
+
+{ TModelEmprestimos }
+
+function TModelEmprestimos.ALUNO: Integer;
+begin
+  Result := FID_ALUNO
+end;
+
+function TModelEmprestimos.ALUNO(Value: Integer): iModelEmprestimos;
+begin
+  Result := Self;
+  FID_ALUNO := Value;
+end;
+
+function TModelEmprestimos.ATIVO: Boolean;
+begin
+  Result := FATIVO;
+end;
+
+function TModelEmprestimos.ATIVO(Value: Boolean): iModelEmprestimos;
+begin
+  Result := Self;
+  FATIVO := Value;
+end;
+
+constructor TModelEmprestimos.Create;
+begin
+
+end;
+
+destructor TModelEmprestimos.Destroy;
+begin
+
+  inherited;
+end;
+
+function TModelEmprestimos.DEVOLUCAO(Value: TDateTime): iModelEmprestimos;
+begin
+  Result := Self;
+  FDT_DEVOLUCAO := Value;
+end;
+
+function TModelEmprestimos.DEVOLUCAO: TDate;
+begin
+  Result := FDT_DEVOLUCAO;
+end;
+
+function TModelEmprestimos.EMPRESTIMO(Value: TDateTime): iModelEmprestimos;
+begin
+  Result := Self;
+  FDT_EMPRESTIMO := Value;
+end;
+
+function TModelEmprestimos.EMPRESTIMO: TDate;
+begin
+  Result := FDT_EMPRESTIMO;
+end;
+
+function TModelEmprestimos.ID: Integer;
+begin
+  Result := FID;
+end;
+
+function TModelEmprestimos.ID(Value: Integer): iModelEmprestimos;
+begin
+  Result := Self;
+  FID := Value;
+end;
+
+function TModelEmprestimos.LIVRO(Value: Integer): iModelEmprestimos;
+begin
+  Result := Self;
+  FID_LIVRO := Value;
+end;
+
+function TModelEmprestimos.LIVRO: Integer;
+begin
+  Result := FID_LIVRO;
+end;
+
+class function TModelEmprestimos.New: iModelEmprestimos;
+begin
+  Result:= Self.Create;
+end;
+
+end.

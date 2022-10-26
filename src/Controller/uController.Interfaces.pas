@@ -1,0 +1,21 @@
+unit uController.Interfaces;
+
+interface
+
+uses
+  uModel.Interfaces;
+
+type
+
+  iController = interface
+    ['{F6FB9FE5-D34C-4802-B9F6-09D7EDA8E4D7}']
+
+    Function Livro : iModelLivro;
+    Function Pessoa : iModelPessoa;
+    Function Permissao : iModelPermissao;
+    Function Emprestimo : iModelEmprestimos;
+  end;
+
+implementation
+
+end.

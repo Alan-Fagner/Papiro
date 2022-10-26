@@ -1,0 +1,130 @@
+unit uModel.Conexao;
+
+interface
+
+uses
+  uModel.Interfaces,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Stan.Param,
+  FireDAC.Stan.StorageBin,
+  FireDAC.Phys,
+  FireDAC.Phys.Intf,
+  FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef,
+  FireDAC.Phys.IBBase,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  FireDAC.Comp.UI,
+  FireDAC.DApt,
+  FireDAC.DApt.Intf,
+  FireDAC.DatS,
+  FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait;
+
+type
+
+  TConexao = class(TInterfacedObject, iConexao)
+  private
+    Connection  : TFDConnection;
+    Cursor      : TFDGUIxWaitCursor;
+    DriverLink  : TFDPhysFBDriverLink;
+    Storage     : TFDStanStorageBinLink;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iConexao;
+
+    Function Conexao : TFDConnection;
+    Function QryOpen(SQL: string): TFDQuery;
+    function Conectar(var erro: string):Boolean;
+  end;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ TConexao }
+
+function TConexao.Conectar(var erro: string): Boolean;
+begin
+  Result := False;
+  try
+    Connection.Connected := False;
+    Connection.LoginPrompt := False;
+    Connection.DriverName:= 'FB';
+    with Connection.Params do begin
+      DriverID          := 'FB';
+      Database          := 'C:\Papiro\DB.FDB';
+      UserName          := 'SYSDBA';
+      Password          := 'masterkey';
+      Values['Server']  := '127.0.0.1';
+      Values['Port']    := '3050';
+    end;
+    DriverLink.VendorLib := 'C:\Papiro\fbclient.dll';
+    Connection.Connected := true;
+    Result := Connection.Connected;
+
+    except on E: Exception do begin
+      Result:= false;
+      erro := 'Houve um problema ao conectar ao banco' + E.Message;
+    end;
+  end;
+end;
+
+function TConexao.Conexao: TFDConnection;
+begin
+  Result := Connection;
+end;
+
+constructor TConexao.Create;
+var Error: string;
+begin
+  Connection      := TFDConnection.Create(nil);
+  Cursor          := TFDGUIxWaitCursor.Create(nil);
+  DriverLink      := TFDPhysFbDriverLink.Create(nil);
+  Storage         := TFDStanStorageBinLink.Create(nil);
+
+  if not (Conectar(Error)) then
+    raise Exception.Create(Error);
+end;
+
+destructor TConexao.Destroy;
+begin
+  Conexao.Connected := False;
+
+  freeandnil(Storage);
+  freeandnil(DriverLink);
+  freeandnil(Cursor);
+  freeandnil(Connection);
+  inherited;
+end;
+
+class function TConexao.New: iConexao;
+begin
+  Result:= Self.Create;
+end;
+
+
+function TConexao.QryOpen(SQL: string): TFDQuery;
+var
+  Qry: TFDQuery;
+begin
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := Connection;
+    Qry.Open(SQL);
+
+    Result := Qry;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+end.

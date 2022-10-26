@@ -1,0 +1,140 @@
+unit uEmprestimo;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage, Vcl.ComCtrls, Vcl.Buttons, uController.Interfaces;
+
+type
+  TFrmEmprestimo = class(TForm)
+    PnFundo: TPanel;
+    PC: TPageControl;
+    TSTabela: TTabSheet;
+    PnDados: TPanel;
+    LV: TListView;
+    PnMenu: TPanel;
+    Label21: TLabel;
+    BtnRemover: TPanel;
+    Image1: TImage;
+    Label2: TLabel;
+    BtnAdicionar: TPanel;
+    Image2: TImage;
+    Label3: TLabel;
+    TSDados: TTabSheet;
+    Panel1: TPanel;
+    BtnVoltar: TPanel;
+    Image3: TImage;
+    Panel2: TPanel;
+    GridPanel1: TGridPanel;
+    RGPesquisar: TRadioGroup;
+    EdtPesquisar: TEdit;
+    BtnPesquisar: TButton;
+    Label4: TLabel;
+    BtnSalvar: TPanel;
+    Image4: TImage;
+    Label5: TLabel;
+    Panel9: TPanel;
+    Label12: TLabel;
+    CBAluno: TComboBox;
+    Panel3: TPanel;
+    Label1: TLabel;
+    CBLivro: TComboBox;
+    LblAtivo: TLabel;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    procedure FormCreate(Sender: TObject);
+    procedure LVDblClick(Sender: TObject);
+    procedure CBAlunoChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+     Controller: iController;
+     Procedure Lista(xAluno: Integer = 0; xLivro: Integer = 0);
+     procedure CarregarPessoa(Nome: string);
+     procedure PreencherCombos;
+  end;
+
+var
+  FrmEmprestimo: TFrmEmprestimo;
+
+implementation
+
+uses
+  uController;
+
+{$R *.dfm}
+
+procedure TFrmEmprestimo.CarregarPessoa(Nome: string);
+begin
+
+end;
+
+procedure TFrmEmprestimo.CBAlunoChange(Sender: TObject);
+begin
+  if Controller.Pessoa.List(CBLivro.Text).Items[0].ATIVO = True then begin
+    LblAtivo.Caption := 'Aluno Ativo';
+    LblAtivo.Font.Color:= clGreen;
+    LblAtivo.Visible := True;
+  end else begin
+    LblAtivo.Caption := 'Aluno Inativo';
+    LblAtivo.Font.Color:= clRed;
+    LblAtivo.Visible := True;
+  end;
+end;
+
+procedure TFrmEmprestimo.FormCreate(Sender: TObject);
+begin
+  Controller := TController.New;
+  PC.ActivePage := TSTabela;
+  Lista;
+end;
+
+procedure TFrmEmprestimo.Lista(xAluno, xLivro: Integer);
+var
+  i, Total: integer;
+  item: TListItem;
+begin
+  LV.Clear;
+
+  with Controller.Emprestimo.List(xAluno,xLivro) do begin
+    for i := 0 to pred(Count) do begin
+      Item := LV.Items.Add;
+      item.Caption := Controller.Pessoa.List(Items[i].ALUNO).NOME;
+      Item.SubItems.Add( Controller.Livro.List(Items[i].LIVRO).TITULO );
+      Item.SubItems.Add( FormatDateTime('dd/mm/yy',Items[i].EMPRESTIMO) );
+
+      if Items[i].ATIVO = False then
+        Item.SubItems.Add( FormatDateTime('dd/mm/yy',Items[i].DEVOLUCAO) );
+    end;
+  end;
+end;
+
+procedure TFrmEmprestimo.LVDblClick(Sender: TObject);
+begin
+  PC.ActivePage := TSDados;
+
+  PreencherCombos;
+//  if LV.ItemIndex >= 0 then
+//    Carregar(LV.ItemFocused.SubItems[0]);
+end;
+
+procedure TFrmEmprestimo.PreencherCombos;
+var i: integer;
+begin
+  with Controller.Pessoa.List('','Aluno') do begin
+    for i := 0 to pred(Count) do begin
+      CBAluno.Items.add(Items[i].NOME);
+    end;
+  end;
+
+  with Controller.Livro.List do begin
+    for i := 0 to pred(Count) do begin
+      CBLivro.Items.add(Items[i].TITULO);
+    end;
+  end;
+end;
+
+end.

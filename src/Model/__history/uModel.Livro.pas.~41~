@@ -1,0 +1,508 @@
+unit uModel.Livro;
+
+interface
+
+uses
+  uModel.Interfaces, 
+  System.Generics.Collections;
+
+type
+
+  TModelLivro = class(TInterfacedObject, iModelLivro)
+  private
+    Conn : iConexao;
+    Lista: TList<iModelLivro>;
+  
+    FID : Integer;
+    FTitulo : string;
+    FSubTitulo : string;
+    FDescricao : string;
+    FVolume : string;
+    FEdicao : string;
+    FPaginas : string;
+    FAno : string;
+    FEditora : Integer;
+    FClassificacao : Integer;
+    FTipo : Integer;
+    FAutor : Integer;
+    FIdioma : Integer;
+    FDisponivel : Boolean;
+    FCapa : string;
+    FIsbn : string;
+    FCutter : string;
+    FCDD : string;
+    FCDU : string;
+    FDT_Cadastro : TDateTime;
+    FUs_Cadastro : Integer;
+    FDT_Alteracao : TDateTime;
+    FUs_Alteracao : Integer;
+    FObs : string;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelLivro;
+
+    Function List(Titulo: string = '') : TList<iModelLivro>;
+    Function insert : Boolean;
+    Function Delete(ID: string) : Boolean;
+    Function Total:string;
+
+    Function ID(Value: Integer) : iModelLivro; overload;
+    Function ID : Integer; overload;
+    Function TITULO(Value: string) : iModelLivro; overload;
+    Function TITULO : string; overload;
+    Function SUBTITULO(Value: string) : iModelLivro; overload;
+    Function SUBTITULO : string; overload;
+    Function DESCRICAO(Value: string) : iModelLivro; overload;
+    Function DESCRICAO : string; overload;
+    Function VOLUME(Value: string) : iModelLivro; overload;
+    Function VOLUME : string; overload;
+    Function EDICAO(Value: string) : iModelLivro; overload;
+    Function EDICAO : string; overload;
+    Function PAGINAS(Value: string) : iModelLivro; overload;
+    Function PAGINAS : string; overload;
+    Function ANO(Value: string) : iModelLivro; overload;
+    Function ANO : string; overload;
+    Function EDITORA(Value: Integer) : iModelLivro; overload;
+    Function EDITORA : Integer; overload;    
+    Function CLASSIFICACAO(Value: Integer) : iModelLivro; overload;
+    Function CLASSIFICACAO : Integer; overload;    
+    Function TIPO(Value: Integer) : iModelLivro; overload;
+    Function TIPO : Integer; overload;    
+    Function AUTOR(Value: Integer) : iModelLivro; overload;
+    Function AUTOR : Integer; overload;  
+    Function IDIOMA(Value: Integer) : iModelLivro; overload;
+    Function IDIOMA : Integer; overload; 
+    Function DISPONIVEL(Value: Boolean) : iModelLivro; overload;
+    Function DISPONIVEL : Boolean; overload;    
+    Function CAPA(Value: string) : iModelLivro; overload;
+    Function CAPA : string; overload;   
+    Function ISBN(Value: string) : iModelLivro; overload;
+    Function ISBN : string; overload; 
+    Function CUTTER(Value: string) : iModelLivro; overload;
+    Function CUTTER : string; overload; 
+    Function CDD(Value: string) : iModelLivro; overload;
+    Function CDD : string; overload;
+    Function CDU(Value: string) : iModelLivro; overload;
+    Function CDU : string; overload;        
+    Function DT_CADASTRO(Value: TDateTime) : iModelLivro; overload;
+    Function DT_CADASTRO : TDateTime; overload;     
+    Function US_CADASTRO(Value: Integer) : iModelLivro; overload;
+    Function US_CADASTRO : Integer; overload;       
+    Function DT_ALTERACAO(Value: TDateTime) : iModelLivro; overload;
+    Function DT_ALTERACAO : TDateTime; overload;    
+    Function US_ALTERACAO(Value: Integer) : iModelLivro; overload;
+    Function US_ALTERACAO : Integer; overload;
+    Function OBS(Value: string) : iModelLivro; overload;
+    Function OBS : string; overload; 
+  end;
+
+implementation
+
+uses
+  uModel.Conexao, System.Classes, System.SysUtils;
+
+{ TModelLivro }
+
+constructor TModelLivro.Create;
+begin
+  Conn := TConexao.New;
+  Lista := TList<iModelLivro>.Create;
+end;
+
+destructor TModelLivro.Destroy;
+begin
+  FreeAndNil(lista);
+  inherited;
+end;
+
+class function TModelLivro.New: iModelLivro;
+begin
+  Result:= Self.Create;
+end;
+
+function TModelLivro.List(Titulo: string): TList<iModelLivro>;
+var
+  item: TModelLivro;
+  SQL: string;
+begin
+  if Titulo = '' then
+    SQL := 'Select * from TB_LIVROS'
+  else
+    SQL := 'Select * from TB_LIVROS Where Titulo like ''%'+Titulo+'%''';
+
+    with Conn.QryOpen(SQL) do begin
+      while not Eof do begin
+        item := TModelLivro.Create;
+        item.ID             ( FieldByName('ID').AsInteger );
+        item.TITULO         ( FieldByName('TITULO').AsString );
+        item.SUBTITULO      ( FieldByName('SUB_TITULO').AsString );
+        item.DESCRICAO      ( FieldByName('DESCRICAO').AsString );
+        item.VOLUME         ( FieldByName('VOLUME').AsString );
+        item.EDICAO         ( FieldByName('EDICAO').AsString );
+        item.PAGINAS        ( FieldByName('PAGINAS').AsString );
+        item.ANO            ( FieldByName('ANO').AsString );
+        item.EDITORA        ( FieldByName('ID_EDITORA').AsInteger );
+        item.CLASSIFICACAO  ( FieldByName('ID_CLASSIFICACAO').AsInteger );
+        item.TIPO           ( FieldByName('ID_TIPO').AsInteger );
+        item.AUTOR          ( FieldByName('ID_AUTOR').AsInteger );
+        item.IDIOMA         ( FieldByName('ID_IDIOMA').AsInteger );
+        item.DISPONIVEL     ( FieldByName('DISPONIVEL').AsBoolean );
+        item.CAPA           ( FieldByName('CAPA').AsString );
+        item.ISBN           ( FieldByName('ISBN').AsString );
+        item.CUTTER         ( FieldByName('CUTTER').AsString );
+        item.CDD            ( FieldByName('CDD').AsString );
+        item.CDU            ( FieldByName('CDU').AsString );
+        item.DT_CADASTRO    ( FieldByName('DT_CADASTRO').AsDateTime );
+        item.US_CADASTRO    ( FieldByName('USUARIO_CADASTRO').AsInteger );
+        item.DT_ALTERACAO   ( FieldByName('DT_ALTERACAO').AsDateTime );
+        item.US_ALTERACAO   ( FieldByName('USUARIO_ALTERACAO').AsInteger );
+        item.OBS            ( FieldByName('OBS').AsString );
+
+        Lista.Add(item);
+        Next;
+      end;
+    end;
+  Result := Lista;
+end;
+
+function TModelLivro.insert: Boolean;
+var
+  SQL: String;         
+begin
+  Result := False;
+  try
+    TrueBoolStrs := ['True'];
+    FalseBoolStrs := ['False'];
+
+    if ID = 0 then begin //se ID = 0 inserir registro senão editar
+      SQL := 'INSERT INTO TB_LIVROS ( TITULO, SUB_TITULO, DESCRICAO, VOLUME, EDICAO, PAGINAS, ANO, ID_EDITORA, ID_CLASSIFICACAO, ID_TIPO, ID_AUTOR, ID_IDIOMA, DISPONIVEL, CAPA, ISBN, CUTTER, CDD, CDU, '+
+             'DT_CADASTRO, USUARIO_CADASTRO, DT_ALTERACAO, USUARIO_ALTERACAO, OBS ) values ( '''+TITULO+''', '''+SUBTITULO+''', '''+DESCRICAO+''', '''+VOLUME+''',  '''+EDICAO+''', '''+PAGINAS+''', '''+ANO+''', '+
+             ''''+IntToStr(EDITORA)+''', '''+IntToStr(CLASSIFICACAO)+''', '''+IntToStr(TIPO)+''', '''+IntToStr(AUTOR)+''', '''+IntToStr(IDIOMA)+''', '''+BoolToStr(DISPONIVEL,True)+''', '''+CAPA+''', '+
+             ''''+ISBN+''', '''+CUTTER+''', '''+CDD+''', '''+CDU+''', '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_CADASTRO)+''', '''+IntToStr(US_CADASTRO)+''', '+
+             ''''+FormatDateTime('yyyy-mm-dd hh:nn',DT_ALTERACAO)+''', '''+IntToStr(US_ALTERACAO)+''', '''+OBS+''' )';
+    end else begin
+      SQL := 'UPDATE TB_LIVROS SET '+
+             'TITULO = '''+TITULO+''', '+
+             'SUB_TITULO = '''+SUBTITULO+''', '+
+             'DESCRICAO = '''+DESCRICAO+''', '+
+             'VOLUME = '''+VOLUME+''', '+
+             'EDICAO = '''+EDICAO+''', '+
+             'PAGINAS = '''+PAGINAS+''', '+
+             'ANO = '''+ANO+''', '+
+             'ID_EDITORA = '''+IntToStr(EDITORA)+''', '+
+             'ID_CLASSIFICACAO =  '''+IntToStr(CLASSIFICACAO)+''', '+
+             'ID_TIPO =  '''+IntToStr(TIPO)+''', '+
+             'ID_AUTOR = '''+IntToStr(AUTOR)+''', '+
+             'ID_IDIOMA = '''+IntToStr(IDIOMA)+''', '+
+             'DISPONIVEL = '''+BoolToStr(DISPONIVEL,True)+''', '+
+             'CAPA = '''+CAPA+''', '+
+             'ISBN = '''+ISBN+''', '+
+             'CUTTER = '''+CUTTER+''', '+
+             'CDD = '''+CDD+''', '+
+             'CDU = '''+CDU+''', '+
+             'DT_CADASTRO = '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_CADASTRO)+''', '+
+             'USUARIO_CADASTRO = '''+IntToStr(US_CADASTRO)+''', '+
+             'DT_ALTERACAO = '''+FormatDateTime('yyyy-mm-dd hh:nn',DT_ALTERACAO)+''', '+
+             'USUARIO_ALTERACAO = '''+IntToStr(US_ALTERACAO)+''', '+
+             'OBS = '''+OBS+''' '+
+             'WHERE ID = '''+IntToStr(ID)+'''';
+    end;
+
+     Conn.QryExecute(SQL);
+
+    Result := True;
+
+    except on E: Exception do begin
+      raise Exception.Create('Erro em Inserir livro'+#13+E.Message);
+    end;
+  end;
+end;
+
+function TModelLivro.Delete(ID: string): Boolean;
+begin
+  Result := False;
+  try
+    try
+      Conn.QryExecute('DELETE FROM TB_LIVROS WHERE ID = '+ID);
+
+      Result := True;
+      except on E: Exception do begin
+        raise Exception.Create('Erro em excluir livro livro'+#13+E.Message);
+      end;
+    end;
+  finally
+  end;
+end;
+    
+function TModelLivro.ANO: string;
+begin
+  Result := FAno;
+end;
+
+function TModelLivro.ANO(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FAno := Value;
+end;
+
+function TModelLivro.AUTOR: Integer;
+begin
+  Result := FAutor;
+end;
+
+function TModelLivro.AUTOR(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FAutor := Value;
+end;
+
+function TModelLivro.CAPA(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FCapa := Value;
+end;
+
+function TModelLivro.CAPA: string;
+begin
+  Result := FCapa;
+end;
+
+function TModelLivro.CDD(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FCDD := Value;
+end;
+
+function TModelLivro.CDD: string;
+begin
+  Result := FCDD;
+end;
+
+function TModelLivro.CDU(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FCDU := Value;
+end;
+
+function TModelLivro.CDU: string;
+begin
+  Result := FCDU;
+end;
+
+function TModelLivro.CLASSIFICACAO: Integer;
+begin
+  Result := FClassificacao;
+end;
+
+function TModelLivro.CLASSIFICACAO(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FClassificacao := Value;
+end;
+
+function TModelLivro.CUTTER: string;
+begin
+  Result := FCutter;
+end;
+
+function TModelLivro.CUTTER(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FCutter := Value;
+end;
+
+function TModelLivro.DESCRICAO(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FDescricao := Value;
+end;
+
+function TModelLivro.DESCRICAO: string;
+begin
+  Result := FDescricao;
+end;
+
+function TModelLivro.DISPONIVEL: Boolean;
+begin
+  Result := FDisponivel;
+end;
+
+function TModelLivro.DISPONIVEL(Value: Boolean): iModelLivro;
+begin
+  Result := Self;
+  FDisponivel := Value;
+end;
+
+function TModelLivro.DT_ALTERACAO: TDateTime;
+begin
+  Result := FDT_Alteracao;
+end;
+
+function TModelLivro.DT_ALTERACAO(Value: TDateTime): iModelLivro;
+begin
+  Result := Self;
+  FDT_Alteracao := Value;
+end;
+
+function TModelLivro.DT_CADASTRO(Value: TDateTime): iModelLivro;
+begin
+  Result := Self;
+  FDT_Cadastro := Value;
+end;
+
+function TModelLivro.DT_CADASTRO: TDateTime;
+begin
+  Result := FDT_Cadastro;
+end;
+
+function TModelLivro.EDICAO(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FEdicao := Value;
+end;
+
+function TModelLivro.EDICAO: string;
+begin
+  Result := FEdicao;
+end;
+
+function TModelLivro.EDITORA(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FEditora := Value;
+end;
+
+function TModelLivro.EDITORA: Integer;
+begin
+  Result := FEditora;
+end;
+
+function TModelLivro.ID: Integer;
+begin
+  Result := FID;
+end;
+
+function TModelLivro.ID(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FID := Value;
+end;
+
+function TModelLivro.IDIOMA: Integer;
+begin
+  Result := FIdioma;
+end;
+
+function TModelLivro.IDIOMA(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FIdioma := Value;
+end;
+
+function TModelLivro.ISBN: string;
+begin
+  Result := FIsbn;
+end;
+
+function TModelLivro.ISBN(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FIsbn := Value;
+end;
+
+function TModelLivro.OBS: string;
+begin
+  Result := FObs;
+end;
+
+function TModelLivro.OBS(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FObs := Value;
+end;
+
+function TModelLivro.PAGINAS: string;
+begin
+  Result := FPaginas;
+end;
+
+function TModelLivro.PAGINAS(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FPaginas := Value;
+end;
+
+function TModelLivro.SUBTITULO: string;
+begin
+  Result := FSubTitulo;
+end;
+
+function TModelLivro.SUBTITULO(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FSubTitulo := Value;
+end;
+
+function TModelLivro.TIPO: Integer;
+begin
+  Result := FTipo;
+end;
+
+function TModelLivro.TIPO(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FTipo := Value;
+end;
+
+function TModelLivro.TITULO: string;
+begin
+  Result := FTitulo;
+end;
+
+function TModelLivro.Total: string;
+begin
+  Result := Conn.QryOpen('select count(ID) from TB_LIVROS').Fields[0].AsString;
+end;
+
+function TModelLivro.TITULO(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FTitulo := Value;
+end;
+
+function TModelLivro.US_ALTERACAO(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FUs_Alteracao := Value;
+end;
+
+function TModelLivro.US_ALTERACAO: Integer;
+begin
+  Result := FUs_Alteracao;
+end;
+
+function TModelLivro.US_CADASTRO: Integer;
+begin
+  Result := FUs_Cadastro;
+end;
+
+function TModelLivro.US_CADASTRO(Value: Integer): iModelLivro;
+begin
+  Result := Self;
+  FUs_Cadastro := Value;
+end;
+
+function TModelLivro.VOLUME: string;
+begin
+  Result := FVolume;
+end;
+
+function TModelLivro.VOLUME(Value: string): iModelLivro;
+begin
+  Result := Self;
+  FVolume := Value;
+end;
+
+end.

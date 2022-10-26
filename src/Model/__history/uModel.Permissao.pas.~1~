@@ -1,0 +1,40 @@
+unit uModel.Permissao;
+
+interface
+
+uses
+  uModel.Interfaces;
+
+type
+
+  TModelPermissao = class(TInterfacedObject, iModelPermissao)
+  private
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelPermissao;
+
+  end;
+
+implementation
+
+{ TModelPermissao }
+
+constructor TModelPermissao.Create;
+begin
+
+end;
+
+destructor TModelPermissao.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TModelPermissao.New: iModelPermissao;
+begin
+  Result:= Self.Create;
+end;
+
+end.

@@ -1,0 +1,115 @@
+unit uModel.Permissao;
+
+interface
+
+uses
+  uModel.Interfaces;
+
+type
+
+  TModelPermissao = class(TInterfacedObject, iModelPermissao)
+  private
+    Conn : iConexao;
+
+    FID: Integer;
+    FPERFIL : string;
+    FMODULO : string;
+    FPERMISSAO : Boolean;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelPermissao;
+
+    Function VerificaPermissao(Perfil: string = '';Modulo : string = '') : iModelPermissao;
+
+    Function ID(Value: Integer) : iModelPermissao; overload;
+    Function ID : Integer; overload;
+    Function PERFIL(Value: string) : iModelPermissao; overload;
+    Function PERFIL : string; overload;
+    Function MODULO(Value: string) : iModelPermissao; overload;
+    Function MODULO : string; overload;
+    Function PERMISSAO(Value: Boolean) : iModelPermissao; overload;
+    Function PERMISSAO : Boolean; overload;
+
+  end;
+
+implementation
+
+uses
+  uModel.Conexao;
+
+{ TModelPermissao }
+
+constructor TModelPermissao.Create;
+begin
+  Conn := TConexao.New;
+end;
+
+destructor TModelPermissao.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TModelPermissao.New: iModelPermissao;
+begin
+  Result:= Self.Create;
+end;
+
+function TModelPermissao.ID(Value: Integer): iModelPermissao;
+begin
+  Result := Self;
+  FID := Value;
+end;
+
+function TModelPermissao.ID: Integer;
+begin
+  Result := FID;
+end;
+
+function TModelPermissao.MODULO: string;
+begin
+  Result := FMODULO;
+end;
+
+function TModelPermissao.MODULO(Value: string): iModelPermissao;
+begin
+  Result := Self;
+  FMODULO := Value;
+end;
+
+function TModelPermissao.PERFIL(Value: string): iModelPermissao;
+begin
+  Result := Self;
+  FPERFIL := Value;
+end;
+
+function TModelPermissao.PERFIL: string;
+begin
+  Result := FPERFIL;
+end;
+
+function TModelPermissao.PERMISSAO(Value: Boolean): iModelPermissao;
+begin
+  Result := Self;
+  FPERMISSAO := Value;
+end;
+
+function TModelPermissao.PERMISSAO: Boolean;
+begin
+  Result := FPERMISSAO;
+end;
+
+function TModelPermissao.VerificaPermissao(Perfil, Modulo: string): iModelPermissao;
+begin
+  with Conn.QryOpen('Select * from TB_PERMISSOES where (PERFIL = '''+Perfil+''') and (MODULO = '''+Modulo+''')') do begin
+    Self.ID        ( FieldByName('ID').AsInteger );
+    Self.PERFIL   ( FieldByName('PERFIL').AsString );
+    Self.MODULO    ( FieldByName('MODULO').AsString );
+    Self.PERMISSAO ( FieldByName('PERMISSAO').AsBoolean );
+  end;
+
+end;
+
+end.

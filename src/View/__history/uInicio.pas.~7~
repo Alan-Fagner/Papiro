@@ -1,0 +1,41 @@
+unit uInicio;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.Imaging.pngimage,
+  Vcl.StdCtrls, Vcl.Grids, Vcl.Outline;
+
+type
+  TFrmInicio = class(TForm)
+    PnFundo: TPanel;
+    Panel5: TPanel;
+    Panel6: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Image1: TImage;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Image2: TImage;
+    Panel7: TPanel;
+    Panel8: TPanel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Image4: TImage;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmInicio: TFrmInicio;
+
+implementation
+
+{$R *.dfm}
+
+end.

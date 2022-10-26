@@ -1,0 +1,60 @@
+unit uModel.Emprestimos;
+
+interface
+
+uses
+  uModel.Interfaces;
+
+type
+
+  TModelEmprestimos = class(TInterfacedObject, iModelEmprestimos)
+  private
+
+    FID: Integer;
+    FID_ALUNO : Integer;
+    FID_LIVRO : Integer;
+    FDT_EMPRESTIMO : TDate;
+    FDT_DEVOLUCAO : TDate;
+    FATIVO : Boolean;
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New : iModelEmprestimos;
+
+    Function ID(Value: Integer) : iModelEmprestimos; overload;
+    Function ID : Integer; overload;
+    Function ALUNO(Value: Integer) : iModelEmprestimos; overload;
+    Function ALUNO : Integer; overload;
+    Function LIVRO(Value: Integer) : iModelEmprestimos; overload;
+    Function LIVRO : Integer; overload;
+    Function EMPRESTIMO(Value: TDateTime) : iModelEmprestimos; overload;
+    Function EMPRESTIMO : TDate; overload;
+    Function DEVOLUCAO(Value: TDateTime) : iModelEmprestimos; overload;
+    Function DEVOLUCAO : TDate; overload;
+    Function ATIVO(Value: Boolean) : iModelEmprestimos; overload;
+    Function ATIVO : Boolean; overload;
+
+  end;
+
+implementation
+
+{ TModelEmprestimos }
+
+constructor TModelEmprestimos.Create;
+begin
+
+end;
+
+destructor TModelEmprestimos.Destroy;
+begin
+
+  inherited;
+end;
+
+class function TModelEmprestimos.New: iModelEmprestimos;
+begin
+  Result:= Self.Create;
+end;
+
+end.
