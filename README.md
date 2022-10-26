@@ -2,9 +2,11 @@
 
 Este projeto foi criado para apresentar as habilidades no desenvolvimento uma aplicação. Utilizando POO, Padrôes de Projeto, Programação Funcional, Controle de transações, entre outras. 
 
+
 ## Descrição
 
 O Objetivo do projeto é fazer um sistema gerenciamento de biblioteca
+
 
 ## Começando
 
@@ -19,6 +21,7 @@ Administrador: Login: Admin / Senha: 123
 Operador: Login: Operador / Senha: 123
   
 Aluno: Login: Aluno / Senha: 123
+
 
 ## Construído com
 Delphi 10.3.3
