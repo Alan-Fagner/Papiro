@@ -1,4 +1,4 @@
-# Projeto Rest
+# Projeto Papiro - Gestão de Bibliotecas
 
 Este projeto foi criado para apresentar as habilidades no desenvolvimento uma aplicação. Utilizando POO, Padrôes de Projeto, Programação Funcional, Controle de transações, entre outras. 
 
