@@ -14,17 +14,11 @@ C:\Papiro
 
 Login para teste
 
-Administrador
-Login: Admin
-Senha: 123
+Administrador: Login: Admin / Senha: 123
   
-Operador
-Login: Operador
-Senha: 123
+Operador: Login: Operador / Senha: 123
   
-Aluno
-Login: Aluno
-Senha: 123
+Aluno: Login: Aluno / Senha: 123
 
 ## Construído com
 Delphi 10.3.3
